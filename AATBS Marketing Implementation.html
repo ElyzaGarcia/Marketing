@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#EEF2F7;padding:16px;min-height:100vh}
+:root{
+  --navy:#1B2A4A;--navy2:#243868;
+  --gold:#AE8C2A;--gold-pale:#FBF5E6;--gold-brd:#E8D8A0;
+  --white:#fff;--bg:#EEF2F7;--brd:#DDE4EE;--brd-l:#ECF0F7;
+  --td:#1B2A4A;--tm:#4B6580;--tl:#8BA0B8;
+  --done-c:#166534;--done-bg:#DCFCE7;--done-bar:#22C55E;--done-brd:#86EFAC;
+  --act-c:#92400E;--act-bg:#FFFBEB;--act-bar:#F59E0B;--act-brd:#FCD34D;
+  --plan-c:#1E3A8A;--plan-bg:#EFF6FF;--plan-bar:#93C5FD;--plan-brd:#BFDBFE;
+  --red-c:#991B1B;--red-bg:#FEF2F2;--red-bar:#F87171;--red-brd:#FECACA;
+  --purp-c:#5B21B6;--purp-bg:#F5F3FF;--purp-bar:#A78BFA;--purp-brd:#DDD6FE;
+}
+.card{background:var(--white);border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(27,42,74,.12);border:1px solid var(--brd)}
+.hdr{background:var(--navy);padding:16px 28px 12px;position:relative}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;width:45%;height:3px;background:linear-gradient(90deg,var(--gold),transparent)}
+.hdr-eyebrow{color:var(--gold);font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:4px}
+.hdr-title{color:#fff;font-size:19px;font-weight:700;line-height:1.2}
+.hdr-sub{color:rgba(255,255,255,.5);font-size:11px;margin-top:3px}
+.hdr-meta{color:rgba(255,255,255,.28);font-size:9.5px;text-align:right;line-height:1.7}
+.body{padding:20px 28px;background:#FAFBFC}
+.ftr{border-top:1px solid var(--brd);padding:7px 28px;display:flex;justify-content:space-between;align-items:center;background:var(--white)}
+.ftr-brand{color:var(--tl);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase}
+.ftr-legend{display:flex;gap:14px;align-items:center}
+.leg{font-size:9.5px;font-weight:600;display:flex;align-items:center;gap:3px}
+.leg-done{color:var(--done-c)}.leg-act{color:var(--act-c)}.leg-plan{color:var(--plan-c)}
+.nav{max-width:980px;margin:0 auto 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:11.5px;font-weight:600;font-family:inherit;transition:all .15s;outline:none}
+.tab.active{background:var(--navy);color:#fff;box-shadow:0 2px 12px rgba(27,42,74,.2)}
+.tab.inactive{background:var(--white);color:var(--tm);box-shadow:0 1px 4px rgba(0,0,0,.08);border:1px solid var(--brd)}
+.nav-controls{display:flex;gap:6px;align-items:center}
+.nav-hint{font-size:10px;color:var(--tl)}
+.arr-btn{padding:5px 11px;border-radius:6px;border:1px solid var(--brd);background:var(--white);cursor:pointer;font-size:13px;font-family:inherit;color:var(--tm)}
+.arr-btn:disabled{opacity:.4;cursor:not-allowed}
+.dots{display:flex;justify-content:center;gap:7px;margin-top:12px}
+.dot{border:none;border-radius:4px;height:7px;cursor:pointer;transition:all .2s}
+.dot.active{width:22px;background:var(--navy)}
+.dot.inactive{width:7px;background:var(--brd)}
+.slide-wrap{max-width:980px;margin:0 auto}
+
+/* Slide 1 – Overview */
+.phase-bar{display:flex;gap:3px;height:6px;border-radius:3px;overflow:hidden;margin-bottom:14px}
+.phase-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ph-card{background:var(--white);border-radius:8px;border:1px solid var(--brd);padding:12px 14px}
+.ph-num{font-size:8.5px;font-weight:700;color:var(--tl);letter-spacing:.12em;text-transform:uppercase}
+.ph-title{font-size:15px;font-weight:700;color:var(--navy);margin:2px 0}
+.ph-date{font-size:9.5px;color:var(--tm)}
+.ph-divider{border-top:1px solid var(--brd-l);margin:10px 0 10px}
+.ph-item{display:flex;gap:5px;margin-bottom:4.5px;align-items:flex-start;font-size:10.5px;line-height:1.3}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);margin-top:12px;background:var(--gold-pale);border-radius:8px;border:1px solid var(--gold-brd)}
+.stat-cell{text-align:center;padding:9px 10px}
+.stat-cell:not(:last-child){border-right:1px solid var(--gold-brd)}
+.stat-val{font-size:22px;font-weight:800;line-height:1}
+.stat-lbl{font-size:9.5px;color:var(--tm);margin-top:3px}
+
+/* Slide 2 – Gantt */
+.gantt-wrap{font-size:11px}
+.gantt-hdr-row{display:flex;margin-bottom:3px}
+.gantt-spacer{flex-shrink:0}
+.month-row{display:flex;border-radius:5px 5px 0 0;overflow:hidden;flex:1}
+.month-cell{text-align:center;padding:4px 0;font-size:8.5px;font-weight:700;color:var(--gold);letter-spacing:.12em}
+.week-row{display:flex;flex:1}
+.week-cell{flex:1;text-align:center;font-size:7px;color:var(--tl);line-height:1.3;border-right:1px dashed var(--brd-l);padding:2px 0}
+.week-cell:last-child{border-right:none}
+.gantt-row{display:flex;align-items:center;margin-bottom:4px}
+.gantt-label{display:flex;align-items:center;gap:5px;justify-content:flex-end;text-align:right;padding-right:8px;font-size:10.5px;color:var(--td);flex-shrink:0}
+.bar-area{flex:1;position:relative;height:20px;background:#EAEFF7;border-radius:4px}
+.bar-gridline{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.8)}
+.gantt-bar{position:absolute;top:3px;bottom:3px;border-radius:3px;display:flex;align-items:center;padding-left:5px;overflow:hidden}
+.gantt-bar-lbl{font-size:8px;font-weight:600;white-space:nowrap}
+.today-wrap{display:flex;flex:1;position:relative;height:18px}
+.today-inner{position:absolute;display:flex;flex-direction:column;align-items:center}
+.today-arrow{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--act-bar)}
+.today-lbl{font-size:8px;color:var(--act-c);font-weight:700;white-space:nowrap;margin-top:1px}
+
+/* Slide 3 – Strategic Initiatives */
+.tl-phase-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.tl-phase-pill{display:flex;align-items:center;gap:5px;padding:3px 10px;background:var(--white);border:1px solid var(--brd);border-radius:20px;font-size:9.5px;color:var(--tm)}
+.tl-dot-swatch{width:7px;height:7px;border-radius:50%}
+.tl-block{background:var(--white);border-radius:9px;border:1px solid var(--brd);padding:14px 12px;margin-bottom:9px}
+.tl-block-label{font-size:8.5px;font-weight:700;color:var(--tl);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.tl-inner{position:relative}
+.tl-line{position:absolute;top:12px;height:2px;border-radius:1px}
+.tl-events{display:flex;position:relative;z-index:2}
+.tl-event{flex:1;display:flex;flex-direction:column;align-items:center}
+.tl-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:3px solid var(--white)}
+.tl-sym{color:#fff;font-size:7.5px;font-weight:800}
+.tl-date{font-size:7.5px;font-weight:700;margin:3px 0 2px;text-align:center}
+.tl-evtitle{font-size:9.5px;font-weight:700;color:var(--navy);text-align:center;line-height:1.3;padding:0 3px}
+.tl-evdesc{font-size:8px;color:var(--tm);text-align:center;line-height:1.3;margin-top:1px;padding:0 2px}
+
+/* Slide 4 – KPI Framework */
+.prio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.prio-card{background:var(--white);border-radius:10px;border:1px solid var(--brd);padding:14px 15px}
+.prio-badge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:3px 10px 3px 8px;border-width:1px;border-style:solid;margin-bottom:5px}
+.prio-swatch{width:6px;height:6px;border-radius:50%}
+.prio-badge-lbl{font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.prio-sub{font-size:10px;color:var(--tl);margin-bottom:10px}
+.prio-items{display:flex;flex-direction:column;gap:7px}
+.prio-item{padding:8px 10px;border-radius:7px;border-width:1px;border-style:solid}
+.prio-item-name{font-size:11px;font-weight:700;margin-bottom:2px}
+.prio-item-why{font-size:9.5px;color:var(--tm);line-height:1.4}
+
+/* Slide 5 – Summary */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sum-section-lbl{font-size:9.5px;font-weight:700;color:var(--tl);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.sum-items{display:flex;flex-direction:column;gap:5px}
+.sum-item{display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:6px;border-width:1px;border-style:solid}
+.sum-sym{font-weight:800;font-size:11px;flex-shrink:0}
+.sum-txt{font-size:10.5px;line-height:1.3}
+.um-items{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.um-item{display:flex;gap:10px;align-items:center;padding:6px 10px;background:var(--white);border-radius:6px;border:1px solid var(--brd)}
+.um-date{font-size:9px;font-weight:700;color:var(--plan-c);flex-shrink:0;min-width:42px}
+.um-title{font-size:10.5px;color:var(--td);flex:1}
+.um-phase{font-size:8.5px;color:var(--tl);flex-shrink:0}
+.focus-box{background:var(--navy);border-radius:8px;padding:12px 14px;border-left:4px solid var(--gold)}
+.focus-lbl{font-size:8.5px;font-weight:700;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.focus-txt{font-size:10.5px;color:rgba(255,255,255,.85);line-height:1.6}
+</style>
+</head>
+<body>
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">AATBS Marketing Operations & Implementation Plan — 5-slide executive presentation covering overview, implementation schedule, strategic initiatives, success measures, and executive summary for June–August 2026</h2>
+
+<div class="nav">
+  <div class="tabs" id="tabs"></div>
+  <div class="nav-controls">
+    <span class="nav-hint"></span>
+    <button class="arr-btn" id="prev" onclick="go(-1)">←</button>
+    <button class="arr-btn" id="next" onclick="go(1)">→</button>
+  </div>
+</div>
+
+<div class="slide-wrap" id="slide"></div>
+
+<div class="dots" id="dots"></div>
+
+<script>
+const TABS=['Overview','Schedule','Initiatives','KPIs','Summary'];
+const SY={DONE:'✓',ACTIVE:'◐',PLANNED:'○'};
+
+// Slide 1 – Executive Overview
+const PHASES=[
+  {name:'Completed Work',title:'Foundation',dates:'Pre 22 Jun 2026',accent:'#22C55E',
+   items:[
+     {t:'Website Review',s:'DONE'},
+     {t:'Service Review',s:'DONE'},
+     {t:'Marketing Review',s:'DONE'},
+     {t:'Marketing Strategy & Growth Plan',s:'DONE'},
+     {t:'Google Review Growth Initiative',s:'DONE'},
+     {t:'Review Links & Templates Created',s:'DONE'},
+     {t:'Review Communications Approved',s:'DONE'},
+     {t:'Client Database Received',s:'DONE'},
+     {t:'Email Platform Research',s:'DONE'},
+     {t:'Marketing Operations & Implementation Plan',s:'DONE'},
+   ]},
+  {name:'Active Work',title:'In Progress',dates:'22–26 Jun 2026',accent:'#F59E0B',
+   items:[
+     {t:'Review Outreach Commenced',s:'ACTIVE'},
+     {t:'Google Review Campaign Running',s:'ACTIVE'},
+     {t:'Competitor Research',s:'ACTIVE'},
+     {t:'Marketing Infrastructure Setup',s:'ACTIVE'},
+   ]},
+  {name:'Strategic Initiatives',title:'10 Planned',dates:'Jun–Aug 2026',accent:'#60A5FA',
+   items:[
+     {t:'Google Review Growth Initiative',s:'PLANNED'},
+     {t:'Social Media Management',s:'PLANNED'},
+     {t:'LinkedIn Strategy',s:'PLANNED'},
+     {t:'Personal Branding Strategy',s:'PLANNED'},
+     {t:'Content Distribution Strategy',s:'PLANNED'},
+     {t:'Email Marketing',s:'PLANNED'},
+     {t:'Lead Generation Strategy',s:'PLANNED'},
+     {t:'Google Business Profile & Local Marketing',s:'PLANNED'},
+     {t:'Referral Partnership Program',s:'PLANNED'},
+     {t:'Marketing Infrastructure & Reporting',s:'PLANNED'},
+   ]},
+  {name:'Implementation',title:'Statistics',dates:'9-Week Program',accent:'#A78BFA',
+   items:[
+     {t:'10 Deliverables Already Complete',s:'DONE'},
+     {t:'4 Activities Currently Active',s:'ACTIVE'},
+     {t:'10 Strategic Initiatives Planned',s:'PLANNED'},
+     {t:'9 Implementation Weeks',s:'PLANNED'},
+   ]},
+];
+
+// Slide 2 – Implementation Schedule (Gantt)
+const WEEKS=['17–19\nJun','22–26\nJun','29Jun–\n3Jul','6–10\nJul','13–17\nJul','20–24\nJul','27–31\nJul','3–7\nAug','10–14\nAug','17–21\nAug'];
+const MONTHS=[{l:'JUNE',w:2},{l:'JULY',w:5},{l:'AUGUST',w:3}];
+const GANTT=[
+  {n:'Onboarding',st:0,en:1,s:'DONE'},
+  {n:'Google Reviews',st:1,en:10,s:'ACTIVE'},
+  {n:'Competitor Research',st:1,en:2,s:'ACTIVE'},
+  {n:'Marketing Infrastructure',st:1,en:2,s:'ACTIVE'},
+  {n:'Social Media Management',st:2,en:10,s:'PLANNED'},
+  {n:'Content Distribution',st:2,en:10,s:'PLANNED'},
+  {n:'LinkedIn Strategy',st:2,en:4,s:'PLANNED'},
+  {n:'Personal Branding',st:4,en:5,s:'PLANNED'},
+  {n:'Email Marketing',st:4,en:6,s:'PLANNED'},
+  {n:'Newsletter Launch',st:5,en:6,s:'PLANNED'},
+  {n:'Lead Generation Strategy',st:6,en:7,s:'PLANNED'},
+  {n:'Lead Nurturing & Automation',st:7,en:8,s:'PLANNED'},
+  {n:'Referral Partnership Program',st:8,en:9,s:'PLANNED'},
+  {n:'Performance Review & Roadmap',st:9,en:10,s:'PLANNED'},
+];
+
+// Slide 3 – Strategic Initiatives (Timeline-style grouped display)
+const INITIATIVES_GROUPS=[
+  {label:'Visibility',color:'#22C55E',items:[
+    {d:'Wk 1–9',t:'Google Review Growth Initiative',desc:'Build social proof & star rating through structured client outreach'},
+    {d:'Wk 2–9',t:'Google Business Profile & Local Marketing',desc:'Profile optimisation, local content, review management and local search visibility growth'},
+    {d:'Wk 2–9',t:'Social Media Management',desc:'Consistent multi-channel presence across relevant platforms'},
+  ]},
+  {label:'Authority',color:'#60A5FA',items:[
+    {d:'Wk 2–3',t:'LinkedIn Strategy',desc:'Professional network reach, thought leadership & B2B engagement'},
+    {d:'Wk 4',t:'Personal Branding Strategy',desc:'Position principals as trusted accounting & advisory voices'},
+    {d:'Wk 2–9',t:'Content Distribution Strategy',desc:'Structured content calendar published across all channels'},
+  ]},
+  {label:'Lead Generation',color:'#A78BFA',items:[
+    {d:'Wk 5',t:'Email Marketing',desc:'Platform setup, list segmentation & first newsletter distribution'},
+    {d:'Wk 6',t:'Lead Generation Strategy',desc:'Lead magnet creation, landing page & prospect capture'},
+    {d:'Wk 7',t:'Lead Nurturing & Automation',desc:'Email sequences to systematically convert leads to clients'},
+  ]},
+  {label:'Marketing Operations',color:'#F59E0B',items:[
+    {d:'Wk 8',t:'Referral Partnership Program',desc:'Strategic referral relationships with complementary businesses'},
+    {d:'Wk 1–9',t:'Marketing Infrastructure & Reporting',desc:'Dashboard, KPI tracking, reporting framework, marketing database and operational processes'},
+  ]},
+];
+
+// Slide 4 – KPI Framework
+const PRIO=[
+  {tier:'Website',sub:'Digital Presence Metrics',c:'var(--done-c)',bg:'var(--done-bg)',bar:'var(--done-bar)',brd:'var(--done-brd)',
+   items:[
+     {n:'Organic Traffic',w:'Month-on-month growth in search-driven visits'},
+     {n:'Consultation Bookings',w:'Online bookings made through the website'},
+     {n:'Contact Form Enquiries',w:'Inbound enquiries via website contact form'},
+   ]},
+  {tier:'Google & Social',sub:'Visibility & Engagement Metrics',c:'var(--act-c)',bg:'var(--act-bg)',bar:'var(--act-bar)',brd:'var(--act-brd)',
+   items:[
+     {n:'Reviews Gained',w:'New Google reviews received during the period'},
+     {n:'Average Star Rating',w:'Overall rating maintained on Google Business Profile'},
+     {n:'Review Response Rate',w:'Percentage of reviews responded to by AATBS'},
+     {n:'Reach & Follower Growth',w:'Social media audience size and content reach'},
+     {n:'Engagement & Shares',w:'Likes, comments, shares and saves across platforms'},
+   ]},
+  {tier:'LinkedIn & Email',sub:'Professional & Nurture Metrics',c:'var(--plan-c)',bg:'var(--plan-bg)',bar:'var(--plan-bar)',brd:'var(--plan-brd)',
+   items:[
+     {n:'Connections & Profile Views',w:'LinkedIn network growth and profile visibility'},
+     {n:'LinkedIn Engagement',w:'Post interactions and website clicks from LinkedIn'},
+     {n:'Email Subscribers',w:'Database size and new subscriber growth'},
+     {n:'Open & Click-Through Rates',w:'Email campaign performance indicators'},
+   ]},
+  {tier:'Business Outcomes',sub:'Lead & Revenue Metrics',c:'var(--red-c)',bg:'var(--red-bg)',bar:'var(--red-bar)',brd:'var(--red-brd)',
+   items:[
+     {n:'Qualified Leads',w:'Prospects who meet the AATBS advisory client profile'},
+     {n:'Consultation Bookings',w:'Booked discovery and advisory consultations'},
+     {n:'Advisory Enquiries',w:'Inbound requests for advisory services specifically'},
+     {n:'New Clients',w:'Converted leads who become paying clients'},
+     {n:'Referral Enquiries',w:'Leads sourced through the referral partner program'},
+   ]},
+];
+
+function stColor(s){return s==='DONE'?'var(--done-c)':s==='ACTIVE'?'var(--act-c)':'var(--plan-c)'}
+function stBg(s){return s==='DONE'?'var(--done-bg)':s==='ACTIVE'?'var(--act-bg)':'var(--plan-bg)'}
+function stBar(s){return s==='DONE'?'var(--done-bar)':s==='ACTIVE'?'var(--act-bar)':'var(--plan-bar)'}
+function stBrd(s){return s==='DONE'?'var(--done-brd)':s==='ACTIVE'?'var(--act-brd)':'var(--plan-brd)'}
+
+function frame(n,title,sub,content){
+  return`<div class="card"><div class="hdr"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="hdr-eyebrow">AATBS · MARKETING OPERATIONS & IMPLEMENTATION PLAN</div><div class="hdr-title">${title}</div>${sub?`<div class="hdr-sub">${sub}</div>`:''}</div><div class="hdr-meta"><div>June – August 2026</div><div>Slide ${n} / 5</div></div></div></div><div class="body">${content}</div><div class="ftr"><span class="ftr-brand">CONFIDENTIAL · AATBS DIRECTOR BRIEFING</span><div class="ftr-legend"><span class="leg leg-done">✓ Completed</span><span class="leg leg-act">◐ In Progress</span><span class="leg leg-plan">○ Planned</span></div></div></div>`;
+}
+
+// SLIDE 1 – Executive Overview
+function renderOverview(){
+  const bar=`<div class="phase-bar">${[{w:10,c:'#22C55E'},{w:4,c:'#F59E0B'},{w:10,c:'#60A5FA'},{w:9,c:'#A78BFA'}].map(s=>`<div style="flex:${s.w};background:${s.c}"></div>`).join('')}</div>`;
+  const grid=`<div class="phase-grid">${PHASES.map(ph=>`<div class="ph-card" style="border-top:3px solid ${ph.accent}"><div class="ph-num">${ph.name}</div><div class="ph-title">${ph.title}</div><div class="ph-date">${ph.dates}</div><div class="ph-divider"></div>${ph.items.map(i=>`<div class="ph-item"><span style="color:${stColor(i.s)};font-weight:700;flex-shrink:0">${SY[i.s]}</span><span style="color:${i.s==='DONE'?'var(--tm)':'var(--td)'}">${i.t}</span></div>`).join('')}</div>`).join('')}</div>`;
+  const stats=`<div class="stat-row">${[['10','✓ Deliverables Complete','var(--done-c)'],['4','◐ Currently Active','var(--act-c)'],['10','○ Strategic Initiatives','var(--plan-c)'],['9','Implementation Weeks','var(--navy)']].map(([v,l,c])=>`<div class="stat-cell"><div class="stat-val" style="color:${c}">${v}</div><div class="stat-lbl">${l}</div></div>`).join('')}</div>`;
+  return frame(1,'Executive Overview','Marketing Operations & Implementation Plan — Status Briefing',bar+grid+stats);
+}
+
+// SLIDE 2 – Implementation Schedule (Gantt)
+function renderSchedule(){
+  const LW=140;
+  const totalW=WEEKS.length;
+  const monthHdr=`<div class="gantt-hdr-row"><div class="gantt-spacer" style="width:${LW}px"></div><div class="month-row">${MONTHS.map(m=>`<div class="month-cell" style="flex:${m.w}">${m.l}</div>`).join('')}</div></div>`;
+  const weekHdr=`<div class="gantt-hdr-row" style="margin-bottom:6px"><div class="gantt-spacer" style="width:${LW}px"></div><div class="week-row">${WEEKS.map((w,i)=>`<div class="week-cell">${w.replace('\n','<br>')}</div>`).join('')}</div></div>`;
+  const rows=GANTT.map(g=>{
+    const pct=v=>((v/totalW)*100).toFixed(2)+'%';
+    const gridlines=WEEKS.slice(1).map((_,i)=>`<div class="bar-gridline" style="left:${pct(i+1)}"></div>`).join('');
+    const bar=`<div class="gantt-bar" style="left:${pct(g.st)};width:${pct(g.en-g.st)};background:${stBar(g.s)}"><span class="gantt-bar-lbl" style="color:${stColor(g.s)}">${g.n}</span></div>`;
+    return`<div class="gantt-row"><div class="gantt-label" style="width:${LW}px"><span style="color:${stColor(g.s)};font-weight:700">${SY[g.s]}</span><span>${g.n}</span></div><div class="bar-area">${gridlines}${bar}</div></div>`;
+  }).join('');
+  // Today marker — 22 Jun is start of week 1 (index ~1.1 of 10)
+  const todayPct=(1.1/totalW*100).toFixed(2)+'%';
+  const todayRow=`<div class="gantt-row"><div class="gantt-spacer" style="width:${LW}px"></div><div class="today-wrap"><div class="today-inner" style="left:${todayPct}"><div class="today-arrow"></div><div class="today-lbl">Today</div></div></div></div>`;
+  const weekLabels=`<div style="margin-top:10px;display:flex;gap:4px;flex-wrap:wrap">${[
+    {w:'Onboarding',d:'17–19 Jun',s:'DONE'},
+    {w:'Week 1',d:'22–26 Jun',s:'ACTIVE'},
+    {w:'Week 2',d:'29 Jun–3 Jul',s:'PLANNED'},
+    {w:'Week 3',d:'6–10 Jul',s:'PLANNED'},
+    {w:'Week 4',d:'13–17 Jul',s:'PLANNED'},
+    {w:'Week 5',d:'20–24 Jul',s:'PLANNED'},
+    {w:'Week 6',d:'27–31 Jul',s:'PLANNED'},
+    {w:'Week 7',d:'3–7 Aug',s:'PLANNED'},
+    {w:'Week 8',d:'10–14 Aug',s:'PLANNED'},
+    {w:'Week 9',d:'17–21 Aug',s:'PLANNED'},
+  ].map(w=>`<div style="display:flex;align-items:center;gap:4px;padding:3px 8px;background:${stBg(w.s)};border:1px solid ${stBrd(w.s)};border-radius:5px;font-size:9px"><span style="color:${stColor(w.s)};font-weight:700">${SY[w.s]}</span><span style="color:${stColor(w.s)};font-weight:600">${w.w}</span><span style="color:var(--tl)">${w.d}</span></div>`).join('')}</div>`;
+  return frame(2,'Implementation Schedule','9-Week Marketing Operations Program — June to August 2026',`<div class="gantt-wrap">${monthHdr}${weekHdr}${rows}${todayRow}</div>${weekLabels}`);
+}
+
+// SLIDE 3 – Strategic Initiatives
+function renderInitiatives(){
+  const pills=`<div class="tl-phase-row">${INITIATIVES_GROUPS.map(g=>`<div class="tl-phase-pill"><div class="tl-dot-swatch" style="background:${g.color}"></div>${g.label}</div>`).join('')}</div>`;
+  const blocks=INITIATIVES_GROUPS.map(g=>{
+    const n=g.items.length;
+    const events=g.items.map(ev=>`<div class="tl-event"><div class="tl-dot" style="background:${g.color}"><span class="tl-sym">◎</span></div><div class="tl-date" style="color:${g.color}">${ev.d}</div><div class="tl-evtitle">${ev.t}</div><div class="tl-evdesc">${ev.desc}</div></div>`).join('');
+    return`<div class="tl-block"><div class="tl-block-label" style="color:${g.color}">${g.label}</div><div class="tl-inner"><div class="tl-line" style="background:${g.color};opacity:.25;left:${(0.5/n*100).toFixed(1)}%;right:${(0.5/n*100).toFixed(1)}%"></div><div class="tl-events">${events}</div></div></div>`;
+  }).join('');
+  const note=`<div style="padding:8px 12px;background:var(--gold-pale);border:1px solid var(--gold-brd);border-radius:7px;font-size:9.5px;color:var(--tm)">ℹ️ <strong>Note:</strong> Competitor Research and Marketing Dashboard are supporting implementation activities, not strategic initiatives. The 10 initiatives above form the core of the marketing program.</div>`;
+  return frame(3,'Strategic Initiatives','10 Core Initiatives Grouped by Marketing Function',pills+blocks+note);
+}
+
+// SLIDE 4 – Success Measures (KPI Framework)
+function renderKPIs(){
+  const grid=`<div class="prio-grid">${PRIO.map(p=>`<div class="prio-card"><div class="prio-badge" style="background:${p.bg};border-color:${p.brd}"><div class="prio-swatch" style="background:${p.bar}"></div><span class="prio-badge-lbl" style="color:${p.c}">${p.tier}</span></div><div class="prio-sub">${p.sub}</div><div class="prio-items">${p.items.map(i=>`<div class="prio-item" style="background:${p.bg};border-color:${p.brd}"><div class="prio-item-name" style="color:${p.c}">${i.n}</div><div class="prio-item-why">${i.w}</div></div>`).join('')}</div></div>`).join('')}</div>`;
+  const note=`<div style="margin-top:12px;padding:8px 12px;background:var(--gold-pale);border:1px solid var(--gold-brd);border-radius:7px;font-size:9.5px;color:var(--tm)">📊 KPIs will be tracked via the Marketing Dashboard established in Week 1. A full performance review and updated roadmap will be delivered at the end of Week 9 (17–21 August 2026).</div>`;
+  return frame(4,'Success Measures','KPI Framework — Tracking Visibility, Engagement & Business Outcomes',grid+note);
+}
+
+// SLIDE 5 – Executive Summary
+function renderSummary(){
+  const completed=[
+    'Website, Service & Marketing Reviews completed',
+    'Marketing Strategy & Growth Plan delivered',
+    'Google Review Growth Initiative established',
+    'Review links, templates & communications approved',
+    'Client database received & review outreach commenced',
+    'Email marketing platform research completed',
+    'Marketing Operations & Implementation Plan completed',
+  ];
+  const active=[
+    'Google review outreach campaign running',
+    'Competitor research underway',
+    'Marketing infrastructure being established',
+  ];
+  const upcoming=[
+    {d:'Wk 2',t:'Social Media Management & Content Planning',ph:'Structure'},
+    {d:'Wk 2',t:'LinkedIn Optimisation',ph:'Authority'},
+    {d:'Wk 3',t:'Content Rollout & LinkedIn Launch',ph:'Authority'},
+    {d:'Wk 4',t:'Personal Branding Strategy',ph:'Authority'},
+    {d:'Wk 4',t:'Email Marketing Setup',ph:'Lead Gen'},
+    {d:'Wk 5',t:'Newsletter Launch',ph:'Lead Gen'},
+    {d:'Wk 6',t:'Lead Generation Strategy',ph:'Lead Gen'},
+    {d:'Wk 7',t:'Lead Nurturing & Automation',ph:'Lead Gen'},
+    {d:'Wk 8',t:'Referral Partnership Program',ph:'Growth'},
+    {d:'Wk 9',t:'Performance Review & Updated Roadmap',ph:'Review'},
+  ];
+  const left=`<div>
+    <div class="sum-section-lbl">Completed</div>
+    <div class="sum-items" style="margin-bottom:14px">
+      ${completed.map(t=>`<div class="sum-item" style="background:var(--done-bg);border-color:var(--done-brd)"><span class="sum-sym" style="color:var(--done-c)">✓</span><span class="sum-txt" style="color:var(--done-c)">${t}</span></div>`).join('')}
+    </div>
+    <div class="sum-section-lbl">Active</div>
+    <div class="sum-items">
+      ${active.map(t=>`<div class="sum-item" style="background:var(--act-bg);border-color:var(--act-brd)"><span class="sum-sym" style="color:var(--act-c)">◐</span><span class="sum-txt" style="color:var(--act-c)">${t}</span></div>`).join('')}
+    </div>
+  </div>`;
+  const right=`<div>
+    <div class="sum-section-lbl">Upcoming — Weeks 2–9</div>
+    <div class="um-items">
+      ${upcoming.map(u=>`<div class="um-item"><div class="um-date">${u.d}</div><div class="um-title">${u.t}</div><div class="um-phase">${u.ph}</div></div>`).join('')}
+    </div>
+    <div class="focus-box">
+      <div class="focus-lbl">Current Focus — Week 1 (22–26 Jun)</div>
+      <div class="focus-txt">Google review outreach is underway with templates and direct links distributed to the client database. Competitor research and marketing infrastructure setup are running in parallel, establishing the performance tracking foundations for the full 9-week program.</div>
+    </div>
+    <div style="margin-top:10px;padding:8px 12px;background:var(--gold-pale);border:1px solid var(--gold-brd);border-radius:7px">
+      <div style="font-size:8.5px;font-weight:700;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Expected Outcomes</div>
+      <div style="margin-top:10px;padding:8px 12px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:7px">
+  <div style="font-size:8.5px;font-weight:700;color:#1E3A8A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">
+    Ongoing Activities
+  </div>
+  <div style="font-size:9.5px;color:var(--tm);line-height:1.6">
+    Google review requests and responses · Facebook publishing · Instagram publishing · LinkedIn publishing · Google Business Profile updates · Monthly newsletters · Content repurposing · KPI tracking · Marketing reporting · Strategy refinement
+  </div>
+</div>
+      <div style="font-size:9.5px;color:var(--tm);line-height:1.6">Improved organic visibility · Strengthened advisory positioning · Increased qualified leads · Higher consultation bookings · Improved client retention · Data-driven marketing roadmap for long-term growth</div>
+    </div>
+  </div>`;
+  return frame(5,'Executive Summary','Marketing Operations & Implementation Plan — Director Briefing',`<div class="sum-grid">${left}${right}</div>`);
+}
+
+const SLIDES=[renderOverview,renderSchedule,renderInitiatives,renderKPIs,renderSummary];
+let cur=0;
+
+function render(){
+  document.getElementById('slide').innerHTML=SLIDES[cur]();
+  const tabs=document.getElementById('tabs');
+  tabs.innerHTML=TABS.map((t,i)=>`<button class="tab ${i===cur?'active':'inactive'}" onclick="setCur(${i})">${t}</button>`).join('');
+  const dots=document.getElementById('dots');
+  dots.innerHTML=TABS.map((_,i)=>`<button class="dot ${i===cur?'active':'inactive'}" onclick="setCur(${i})"></button>`).join('');
+  document.getElementById('prev').disabled=cur===0;
+  document.getElementById('next').disabled=cur===SLIDES.length-1;
+}
+
+function setCur(i){cur=i;render();}
+function go(d){if(cur+d>=0&&cur+d<SLIDES.length){cur+=d;render();}}
+
+render();
+</script>
+</body>
+</html>
